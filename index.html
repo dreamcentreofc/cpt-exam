@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPT Typing Exam - Real Mode</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 80%;
+      max-width: 900px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #passage {
+      background: #f1f5f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      font-size: 16px;
+      white-space: pre-wrap;
+      user-select: none;
+    }
+    #typed {
+      white-space: pre-wrap;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+      min-height: 200px;
+      background: #f9fafb;
+    }
+    .correct {
+      color: black;
+    }
+    .incorrect {
+      color: red;
+      text-decoration: underline;
+    }
+    .stats {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+    }
+    .timer {
+      font-weight: bold;
+      font-size: 18px;
+      color: #d9534f;
+    }
+    button {
+      margin: 10px 5px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CPT Typing Exam - Real Exam Mode</h1>
+    <p>Select Exam Duration:</p>
+    <button onclick="startExam(5)">5 Minutes</button>
+    <button onclick="startExam(10)">10 Minutes</button>
+    <button onclick="startExam(15)">15 Minutes</button>
+
+    <div id="exam" style="display:none;">
+      <p id="passage"></p>
+      <div id="typed"></div>
+      <textarea id="input" placeholder="Start typing here..." disabled></textarea>
+      <div class="stats">
+        <div>WPM: <span id="wpm">0</span></div>
+        <div>Accuracy: <span id="accuracy">0%</span></div>
+        <div>Errors: <span id="errors">0</span></div>
+        <div class="timer">Time Left: <span id="timer">00:00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const passages = [
+      // Longer challenging passages
+      "The development of technology has dramatically transformed the way people communicate, work, and live. From the invention of the printing press to the rise of the internet, each advancement has brought both opportunities and challenges. In modern society, individuals are expected to type quickly and accurately in order to keep up with the demands of a fast-paced environment. Employers value employees who can process information efficiently and adapt to digital tools. To achieve proficiency, consistent practice and a focus on accuracy are just as important as speed. Those who invest time in honing their typing skills often find themselves better prepared for academic, professional, and personal success.",
+      "Education plays a vital role in shaping not only careers but also the character of individuals. Reading and writing are foundational skills, and typing has now become just as essential in the digital world. A strong command of written communication allows people to express their ideas clearly, share knowledge, and collaborate effectively. Typing tests are used in various competitive exams to assess the ability of candidates to manage time while maintaining accuracy. A passage may appear simple at first glance, but the real challenge lies in typing it flawlessly under time constraints. Continuous learning, practice, and persistence can turn an average typist into a highly skilled one.",
+      "Discipline and consistency are the cornerstones of personal growth and achievement. Just as athletes train daily to improve performance, those who wish to excel in typing must dedicate time to structured practice. Typing is not merely about pressing keys on a keyboard; it is about coordination, rhythm, and focus. Random mistakes may occur due to haste, but accuracy can be achieved by maintaining concentration and resisting the urge to rush. Over time, correct posture, finger placement, and muscle memory all contribute to higher speed and reduced fatigue. In exams, these qualities often determine who succeeds under pressure and who struggles to complete the task.",
+      "The importance of digital literacy cannot be overstated in the twenty-first century. Governments, businesses, and educational institutions all rely on typed communication to function smoothly. Whether drafting an official report, filling out forms, or composing an email, typing efficiency plays a crucial role. As the volume of digital information increases, so does the demand for individuals who can manage it effectively. For students preparing for typing exams, the key is to balance speed with precision. Practicing with long passages not only prepares them for real-world scenarios but also builds endurance, which is necessary for sustained performance over extended periods of time."
+    ];
+
+    let timeLeft, timerInterval, startTime;
+    let passageText = "";
+
+    function startExam(minutes) {
+      document.getElementById("exam").style.display = "block";
+      passageText = passages[Math.floor(Math.random() * passages.length)];
+      document.getElementById("passage").innerText = passageText;
+      document.getElementById("typed").innerHTML = "";
+      document.getElementById("input").value = "";
+      document.getElementById("input").disabled = false;
+      document.getElementById("input").focus();
+
+      timeLeft = minutes * 60;
+      updateTimer();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
+      startTime = new Date().getTime();
+
+      document.getElementById("input").addEventListener("keydown", function(e) {
+        if (e.key === "Backspace") e.preventDefault();
+      });
+
+      document.getElementById("input").addEventListener("input", calculateStats);
+    }
+
+    function updateTimer() {
+      let minutes = Math.floor(timeLeft / 60);
+      let seconds = timeLeft % 60;
+      document.getElementById("timer").innerText = `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        endExam();
+      }
+      timeLeft--;
+    }
+
+    function calculateStats() {
+      let typedText = document.getElementById("input").value;
+      let wordsTyped = typedText.trim().split(/\s+/).filter(Boolean).length;
+      let elapsedMinutes = (new Date().getTime() - startTime) / 60000;
+      let wpm = Math.round(wordsTyped / elapsedMinutes);
+
+      let errors = 0;
+      let displayHTML = "";
+      for (let i = 0; i < passageText.length; i++) {
+        if (i < typedText.length) {
+          if (typedText[i] === passageText[i]) {
+            displayHTML += `<span class='correct'>${passageText[i]}</span>`;
+          } else {
+            displayHTML += `<span class='incorrect'>${passageText[i]}</span>`;
+            errors++;
+          }
+        } else {
+          displayHTML += passageText[i];
+        }
+      }
+
+      document.getElementById("typed").innerHTML = displayHTML;
+
+      let accuracy = typedText.length > 0 ? Math.max(0, Math.round(((typedText.length - errors) / typedText.length) * 100)) : 0;
+
+      document.getElementById("wpm").innerText = isNaN(wpm) ? 0 : wpm;
+      document.getElementById("errors").innerText = errors;
+      document.getElementById("accuracy").innerText = accuracy + "%";
+    }
+
+    function endExam() {
+      document.getElementById("input").disabled = true;
+      alert("Time is up! Exam finished. Review your typing above.");
+    }
+  </script>
+</body>
+</html>
