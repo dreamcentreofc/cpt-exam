@@ -1,184 +1,192 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CPT Typing Exam - Real Mode</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dream Centre — CPT Typing Exam</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9fafb;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 80%;
-      max-width: 900px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    #passage {
-      background: #f1f5f9;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      line-height: 1.6;
-      font-size: 16px;
-      white-space: pre-wrap;
-      user-select: none;
-    }
-    #typed {
-      white-space: pre-wrap;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 8px;
-      min-height: 200px;
-      background: #f9fafb;
-    }
-    .correct {
-      color: black;
-    }
-    .incorrect {
-      color: red;
-      text-decoration: underline;
-    }
-    .stats {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 16px;
-    }
-    .timer {
-      font-weight: bold;
-      font-size: 18px;
-      color: #d9534f;
-    }
-    button {
-      margin: 10px 5px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #2563eb;
-      color: white;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    button:hover {
-      background: #1e40af;
-    }
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:linear-gradient(180deg,#071025 0%,#071226 60%);color:#e6eef7;display:flex;align-items:center;justify-content:center;padding:24px}
+    .app{width:100%;max-width:980px}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    .logo{background:var(--glass);padding:10px 12px;border-radius:10px;font-weight:700;color:var(--accent)}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:14px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .controls{display:flex;gap:10px;margin-top:12px}
+    button{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 12px;border-radius:10px;color:inherit;cursor:pointer}
+    button.primary{background:linear-gradient(90deg,var(--accent),#7dd3fc);color:#042027;border:none}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-top:16px}
+    .panel{padding:12px;border-radius:10px;background:rgba(255,255,255,0.02)}
+    .center{display:flex;flex-direction:column;gap:12px}
+    textarea{width:100%;min-height:140px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;resize:vertical}
+    .stats{display:flex;flex-direction:column;gap:8px}
+    .stat{display:flex;justify-content:space-between;padding:8px;border-radius:8px;background:rgba(0,0,0,0.25)}
+    footer{margin-top:14px;color:var(--muted);font-size:13px}
+    .hidden{display:none}
+    @media (max-width:900px){.grid{grid-template-columns:1fr;}.panel.right{order:2}}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>CPT Typing Exam - Real Exam Mode</h1>
-    <p>Select Exam Duration:</p>
-    <button onclick="startExam(5)">5 Minutes</button>
-    <button onclick="startExam(10)">10 Minutes</button>
-    <button onclick="startExam(15)">15 Minutes</button>
-
-    <div id="exam" style="display:none;">
-      <p id="passage"></p>
-      <div id="typed"></div>
-      <textarea id="input" placeholder="Start typing here..." disabled></textarea>
-      <div class="stats">
-        <div>WPM: <span id="wpm">0</span></div>
-        <div>Accuracy: <span id="accuracy">0%</span></div>
-        <div>Errors: <span id="errors">0</span></div>
-        <div class="timer">Time Left: <span id="timer">00:00</span></div>
+  <div class="app">
+    <header>
+      <div class="logo">Dream Centre</div>
+      <div>
+        <h1>Dream Centre — CPT Typing Exam</h1>
+        <p class="lead">Practice timed typing tests for CPT exam preparation. Your progress is saved locally.</p>
       </div>
-    </div>
+    </header>
+
+    <section class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="small">Select your duration and start your typing test.</div>
+        <div class="controls">
+          <button id="mode-type" class="primary">Typing Test</button>
+          <button id="view-scores">View Scores</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="panel center" id="main">
+          <div id="typing-area">
+            <div class="small">Typing passage (press Start to begin). Accuracy and WPM are recorded.</div>
+            <div style="margin-top:8px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);min-height:84px" id="passage">Loading passage...</div>
+            <textarea id="typing-input" placeholder="Type here..." disabled aria-label="Typing input"></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="start-typing" class="primary">Start</button>
+              <button id="end-typing">End</button>
+              <select id="typing-duration">
+                <option value="60">1 minute</option>
+                <option value="300" selected>5 minutes</option>
+                <option value="600">10 minutes</option>
+                <option value="900">15 minutes</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="results" class="hidden">
+            <h3>Results</h3>
+            <div id="results-body"></div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="retry" class="primary">Retry</button>
+              <button id="back-home">Back</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel right">
+          <div class="stats">
+            <div class="stat"><strong>Timer</strong><span id="stat-timer">—</span></div>
+            <div class="stat"><strong>Score</strong><span id="stat-score">—</span></div>
+          </div>
+          <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:12px 0">
+          <div>
+            <h4 style="margin:0 0 8px 0">Saved Scores</h4>
+            <div id="scores-list" class="small">No scores yet.</div>
+          </div>
+        </aside>
+      </div>
+
+      <footer>
+        Built for <strong>Dream Centre</strong>. Stores results locally — deploy easily to Netlify.
+      </footer>
+    </section>
   </div>
 
   <script>
-    const passages = [
-      // Longer challenging passages
-      "The development of technology has dramatically transformed the way people communicate, work, and live. From the invention of the printing press to the rise of the internet, each advancement has brought both opportunities and challenges. In modern society, individuals are expected to type quickly and accurately in order to keep up with the demands of a fast-paced environment. Employers value employees who can process information efficiently and adapt to digital tools. To achieve proficiency, consistent practice and a focus on accuracy are just as important as speed. Those who invest time in honing their typing skills often find themselves better prepared for academic, professional, and personal success.",
-      "Education plays a vital role in shaping not only careers but also the character of individuals. Reading and writing are foundational skills, and typing has now become just as essential in the digital world. A strong command of written communication allows people to express their ideas clearly, share knowledge, and collaborate effectively. Typing tests are used in various competitive exams to assess the ability of candidates to manage time while maintaining accuracy. A passage may appear simple at first glance, but the real challenge lies in typing it flawlessly under time constraints. Continuous learning, practice, and persistence can turn an average typist into a highly skilled one.",
-      "Discipline and consistency are the cornerstones of personal growth and achievement. Just as athletes train daily to improve performance, those who wish to excel in typing must dedicate time to structured practice. Typing is not merely about pressing keys on a keyboard; it is about coordination, rhythm, and focus. Random mistakes may occur due to haste, but accuracy can be achieved by maintaining concentration and resisting the urge to rush. Over time, correct posture, finger placement, and muscle memory all contribute to higher speed and reduced fatigue. In exams, these qualities often determine who succeeds under pressure and who struggles to complete the task.",
-      "The importance of digital literacy cannot be overstated in the twenty-first century. Governments, businesses, and educational institutions all rely on typed communication to function smoothly. Whether drafting an official report, filling out forms, or composing an email, typing efficiency plays a crucial role. As the volume of digital information increases, so does the demand for individuals who can manage it effectively. For students preparing for typing exams, the key is to balance speed with precision. Practicing with long passages not only prepares them for real-world scenarios but also builds endurance, which is necessary for sustained performance over extended periods of time."
+    // Extended long passages (8–10 sentences each)
+    const PASSAGES = [
+      "Regular physical activity is one of the most important things you can do for your health. It helps control weight, strengthens bones and muscles, and improves cardiovascular fitness. Exercise can also reduce the risk of chronic diseases such as diabetes and heart conditions. A daily routine of at least thirty minutes of moderate activity promotes better sleep and mental clarity. Even light activities such as walking or stretching contribute to long-term well-being when performed consistently. Remember, the goal is progress, not perfection, and small improvements each day add up over time. Staying active also enhances energy levels, making daily tasks easier and more enjoyable. Pairing exercise with balanced nutrition creates a strong foundation for lifelong health.",
+      "Nutrition plays a vital role in achieving fitness goals. A balanced diet provides the necessary fuel for energy and recovery. Carbohydrates supply quick energy, while proteins assist in building and repairing muscle tissue. Healthy fats support brain function and hormone production. Hydration is equally important, as water regulates temperature and helps transport nutrients. Avoiding processed foods and focusing on natural sources ensures better digestion and nutrient absorption. Planning meals ahead can prevent poor choices during busy days. Eating mindfully, with attention to portion size and hunger cues, creates sustainable habits that support physical and mental performance.",
+      "Muscular endurance and strength are essential components of overall fitness. Resistance training, when performed with correct technique, improves body composition and metabolism. Free weights, machines, and bodyweight exercises all build strength effectively when used progressively. Recovery time between sessions allows muscles to adapt and grow stronger. Warming up before and cooling down after workouts reduce the risk of injury. Tracking progress with gradual increases in weight or repetitions helps maintain motivation. Consistency in training leads to steady improvement in power and stability, both critical for athletic and daily functional performance.",
+      "The cardiovascular system benefits tremendously from regular aerobic exercise. Activities such as jogging, cycling, and swimming strengthen the heart and lungs. As endurance increases, the body becomes more efficient at delivering oxygen to muscles. Regular aerobic activity also lowers blood pressure and improves cholesterol levels. Interval training, which alternates between high and low intensity, enhances both aerobic and anaerobic capacity. Over time, this form of training leads to improved stamina and reduced fatigue during physical effort. The key is to start gradually and build endurance safely, allowing the body to adapt naturally.",
+      "Proper posture and body alignment are often overlooked aspects of fitness. Maintaining good posture prevents joint strain and promotes efficient movement patterns. Whether sitting, standing, or exercising, awareness of spinal alignment is crucial. Strengthening the core muscles supports posture and balance, reducing back pain and risk of injury. Ergonomic workspaces and regular stretching breaks can also counteract the effects of prolonged sitting. Developing mindful habits in posture leads to greater confidence and presence in daily activities. Over time, these small adjustments can prevent chronic musculoskeletal problems.",
+      "Flexibility and mobility are key to maintaining functional movement. Stretching exercises enhance range of motion, reduce stiffness, and prevent injuries. Incorporating yoga or pilates into weekly routines can improve both flexibility and strength. Dynamic stretches before workouts prepare the body for action, while static stretches afterward promote relaxation. Breathing deeply during stretches increases oxygen flow and helps release muscle tension. Consistent flexibility training supports better posture, movement efficiency, and athletic performance across all age groups.",
+      "Mental health and fitness are closely connected. Exercise triggers the release of endorphins, the body’s natural mood boosters. Regular physical activity helps reduce anxiety, depression, and stress levels. Setting realistic fitness goals provides a sense of achievement and self-discipline. Group workouts or team sports can build social connections and improve motivation. Mindfulness practices like meditation or deep breathing further enhance mental resilience. Prioritizing mental wellness ensures balance and prevents burnout, creating harmony between the body and mind.",
+      "Sleep plays a vital role in recovery and overall performance. During deep sleep, the body repairs tissues, balances hormones, and consolidates memory. Lack of quality sleep can decrease focus, reaction time, and motivation to exercise. Creating a consistent sleep schedule helps regulate the body’s internal clock. Avoiding screens and caffeine before bedtime promotes better rest. A cool, quiet, and dark environment supports uninterrupted sleep. Prioritizing rest days and adequate sleep is just as essential as maintaining a proper training schedule.",
+      "Injury prevention should always be a priority in any fitness program. Listening to your body and recognizing early signs of fatigue can prevent overuse injuries. Gradually increasing training intensity allows tendons and ligaments to strengthen safely. Proper warm-up and cool-down routines, along with stretching, maintain joint health. Wearing the right footwear and using correct technique are also key. Regular rest and hydration aid in faster recovery. Prevention is always better than cure when it comes to maintaining long-term physical activity.",
+      "Fitness is a lifelong journey that requires patience and persistence. Results are achieved through consistent effort, not shortcuts. It is important to set realistic goals that align with personal abilities and lifestyle. Tracking progress provides motivation and accountability. Surrounding yourself with supportive people and professionals can make the journey more rewarding. Celebrate small victories and stay adaptable in your approach. Ultimately, a healthy lifestyle is built through balance, dedication, and a positive mindset toward continuous growth."
     ];
 
-    let timeLeft, timerInterval, startTime;
-    let passageText = "";
+    // DOM
+    const passageEl = document.getElementById('passage');
+    const typingInput = document.getElementById('typing-input');
+    const startBtn = document.getElementById('start-typing');
+    const endBtn = document.getElementById('end-typing');
+    const durationSelect = document.getElementById('typing-duration');
+    const statTimer = document.getElementById('stat-timer');
+    const statScore = document.getElementById('stat-score');
+    const results = document.getElementById('results');
+    const scoresList = document.getElementById('scores-list');
 
-    function startExam(minutes) {
-      document.getElementById("exam").style.display = "block";
-      passageText = passages[Math.floor(Math.random() * passages.length)];
-      document.getElementById("passage").innerText = passageText;
-      document.getElementById("typed").innerHTML = "";
-      document.getElementById("input").value = "";
-      document.getElementById("input").disabled = false;
-      document.getElementById("input").focus();
+    let typingTimer=null, remaining=0, startedAt=null;
 
-      timeLeft = minutes * 60;
-      updateTimer();
-      clearInterval(timerInterval);
-      timerInterval = setInterval(updateTimer, 1000);
-      startTime = new Date().getTime();
-
-      document.getElementById("input").addEventListener("keydown", function(e) {
-        if (e.key === "Backspace") e.preventDefault();
-      });
-
-      document.getElementById("input").addEventListener("input", calculateStats);
+    function setupTyping(){
+      passageEl.textContent = PASSAGES[Math.floor(Math.random()*PASSAGES.length)];
+      typingInput.value=''; typingInput.disabled=true;
+      statTimer.textContent='—'; statScore.textContent='—';
     }
 
-    function updateTimer() {
-      let minutes = Math.floor(timeLeft / 60);
-      let seconds = timeLeft % 60;
-      document.getElementById("timer").innerText = `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        endExam();
-      }
-      timeLeft--;
+    function startTypingTest(){
+      typingInput.disabled=false; typingInput.focus();
+      const duration = parseInt(durationSelect.value,10);
+      remaining = duration; statTimer.textContent = formatTime(remaining);
+      startedAt = Date.now();
+      typingTimer = setInterval(()=>{
+        remaining--;
+        statTimer.textContent = formatTime(remaining);
+        if(remaining<=0) endTypingTest();
+      },1000);
     }
 
-    function calculateStats() {
-      let typedText = document.getElementById("input").value;
-      let wordsTyped = typedText.trim().split(/\s+/).filter(Boolean).length;
-      let elapsedMinutes = (new Date().getTime() - startTime) / 60000;
-      let wpm = Math.round(wordsTyped / elapsedMinutes);
-
-      let errors = 0;
-      let displayHTML = "";
-      for (let i = 0; i < passageText.length; i++) {
-        if (i < typedText.length) {
-          if (typedText[i] === passageText[i]) {
-            displayHTML += `<span class='correct'>${passageText[i]}</span>`;
-          } else {
-            displayHTML += `<span class='incorrect'>${passageText[i]}</span>`;
-            errors++;
-          }
-        } else {
-          displayHTML += passageText[i];
-        }
-      }
-
-      document.getElementById("typed").innerHTML = displayHTML;
-
-      let accuracy = typedText.length > 0 ? Math.max(0, Math.round(((typedText.length - errors) / typedText.length) * 100)) : 0;
-
-      document.getElementById("wpm").innerText = isNaN(wpm) ? 0 : wpm;
-      document.getElementById("errors").innerText = errors;
-      document.getElementById("accuracy").innerText = accuracy + "%";
+    function endTypingTest(){
+      if(typingTimer) clearInterval(typingTimer);
+      typingInput.disabled=true;
+      const typed = typingInput.value.trim();
+      const elapsed = (Date.now()-startedAt)/1000;
+      const words = typed.split(/\s+/).filter(Boolean).length;
+      const wpm = Math.round((words/elapsed)*60);
+      const refWords = passageEl.textContent.split(/\s+/).filter(Boolean);
+      const typedWords = typed.split(/\s+/).filter(Boolean);
+      let matches=0; for(let i=0;i<Math.min(refWords.length,typedWords.length);i++){if(refWords[i].replace(/[^a-z0-9]/gi,'').toLowerCase()===typedWords[i].replace(/[^a-z0-9]/gi,'').toLowerCase())matches++;}
+      const accuracy = Math.round((matches/Math.max(typedWords.length,1))*100);
+      showResults(`<p>Typing test complete.<br>WPM: <strong>${wpm}</strong><br>Accuracy: <strong>${accuracy}%</strong><br>Typed words: <strong>${typedWords.length}</strong></p>`);
+      statScore.textContent = `${wpm} WPM`;
+      saveScore({wpm,accuracy,words:typedWords.length,date:new Date().toISOString()});
     }
 
-    function endExam() {
-      document.getElementById("input").disabled = true;
-      alert("Time is up! Exam finished. Review your typing above.");
+    function formatTime(sec){ const m=Math.floor(sec/60); const s=sec%60; return `${m}:${s.toString().padStart(2,'0')}`; }
+
+    function showResults(html){
+      document.getElementById('typing-area').classList.add('hidden');
+      results.classList.remove('hidden');
+      document.getElementById('results-body').innerHTML=html;
     }
+
+    document.getElementById('retry').addEventListener('click',()=>{ results.classList.add('hidden'); document.getElementById('typing-area').classList.remove('hidden'); setupTyping(); });
+    document.getElementById('back-home').addEventListener('click',()=>{ results.classList.add('hidden'); document.getElementById('typing-area').classList.remove('hidden'); });
+
+    startBtn.addEventListener('click',startTypingTest);
+    endBtn.addEventListener('click',endTypingTest);
+
+    // Local Storage
+    function saveScore(obj){
+      const key='dream-centre-scores';
+      const data=JSON.parse(localStorage.getItem(key)||'[]');
+      data.unshift(obj); if(data.length>30) data.splice(30);
+      localStorage.setItem(key,JSON.stringify(data));
+      renderScores();
+    }
+    function renderScores(){
+      const data=JSON.parse(localStorage.getItem('dream-centre-scores')||'[]');
+      if(!data.length){scoresList.textContent='No scores yet.';return;}
+      scoresList.innerHTML=data.map(s=>`<div style="margin-bottom:8px"><strong>${s.wpm} WPM</strong> — ${s.accuracy}%<div class="small">${new Date(s.date).toLocaleString()}</div></div>`).join('');
+    }
+    document.getElementById('view-scores').addEventListener('click',()=>{results.classList.remove('hidden');document.getElementById('typing-area').classList.add('hidden');renderScores();document.getElementById('results-body').innerHTML=scoresList.innerHTML;});
+
+    setupTyping();
+    renderScores();
   </script>
 </body>
 </html>
